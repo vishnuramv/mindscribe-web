@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Session, Client, GeneratedNote } from '../../types';
 import { generateIntakeNote, generateClientSummary } from '../../services/geminiService';
@@ -36,7 +35,7 @@ const NotesPanel: React.FC<NotesPanelProps> = ({ session, client }) => {
     
     try {
         if (type === 'intake') {
-            const note = await generateIntakeNote(session.transcript);
+            const note = await generateIntakeNote(session.transcript, `${client.firstName} ${client.lastName}`);
             setGeneratedIntakeNote(note);
         } else if (type === 'summary') {
             const summary = await generateClientSummary(session.transcript);
@@ -156,7 +155,7 @@ const NotesPanel: React.FC<NotesPanelProps> = ({ session, client }) => {
                 <div className="bg-white p-4 rounded-lg shadow-sm text-sm">
                     <p className="font-bold mb-2">CLIENT</p>
                     <p className="text-gray-700">{client.firstName} {client.lastName} (demo)</p>
-                    <p className="text-gray-500 truncate">{client.email}</p>
+                    <p className="text-gray-500">{client.email}</p>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm text-sm">
                     <p className="font-bold mb-2">SESSION</p>

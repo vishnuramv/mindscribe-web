@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchClient, fetchSessionsForClient, addSession, deleteClient } from '../services/api';
 import { transcribeAudio } from '../services/elevenLabsService';
+import { structureTranscript } from '../services/geminiService';
 import { Client, Session } from '../types';
 import Spinner from '../components/ui/Spinner';
 import Icon from '../components/ui/Icon';
@@ -79,11 +80,12 @@ const ClientDetailPage: React.FC = () => {
     };
 
     const handleProcessUpload = async (file: File) => {
-        if (!clientId) {
-          throw new Error("Client ID not found.");
+        if (!clientId || !client) {
+          throw new Error("Client not found.");
         }
         try {
-            const transcript = await transcribeAudio(file);
+            const rawTranscript = await transcribeAudio(file);
+            const transcript = await structureTranscript(rawTranscript, client.firstName);
             const newSession = await addSession({
                 clientId,
                 date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
@@ -119,7 +121,7 @@ const ClientDetailPage: React.FC = () => {
     const initials = `${client.firstName[0]}${client.lastName[0]}`;
 
     return (
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex">
             {/* Main content */}
             <div className="flex-1 flex flex-col p-8 overflow-y-auto">
                 <div className="bg-white rounded-lg shadow-sm flex-grow">

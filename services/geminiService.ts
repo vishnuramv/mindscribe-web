@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { TranscriptEntry, GeneratedNote } from '../types';
 
@@ -31,9 +30,74 @@ const intakeNoteSchema = {
     required: ["identificationInformation", "reasonForSeekingTherapy"],
 };
 
-export const generateIntakeNote = async (transcript: TranscriptEntry[]): Promise<GeneratedNote | null> => {
+const transcriptSchema = {
+    type: Type.ARRAY,
+    items: {
+        type: Type.OBJECT,
+        properties: {
+            time: {
+                type: Type.STRING,
+                description: "Estimated timestamp of the dialogue in M:SS format, starting from 0:00 and incrementing."
+            },
+            speaker: {
+                type: Type.STRING,
+                description: "The speaker, either 'You' (for the therapist) or the client's name."
+            },
+            dialogue: {
+                type: Type.STRING,
+                description: "The spoken words for that entry."
+            }
+        },
+        required: ["time", "speaker", "dialogue"]
+    }
+};
+
+export const structureTranscript = async (rawTranscript: string, clientName: string): Promise<TranscriptEntry[]> => {
+    const prompt = `You are an expert in processing therapy session transcripts. Your task is to take a raw text transcript and structure it into a JSON array of dialogue entries. Each entry must have 'time', 'speaker', and 'dialogue' fields.
+
+The speakers are the therapist, who should be labeled as 'You', and the client, whose name is '${clientName}'. The raw transcript may have prefixes like 'T:' for therapist and 'C:' for client. Use these hints to correctly identify the speakers.
+
+Generate estimated timestamps for each entry, starting from '0:00' and incrementing them logically based on the flow of conversation.
+
+The entire output must be a valid JSON array conforming to the provided schema.
+
+Raw Transcript:
+---
+${rawTranscript}
+---
+`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: transcriptSchema,
+            },
+        });
+
+        const jsonString = response.text.trim();
+        const parsedJson = JSON.parse(jsonString);
+        return parsedJson as TranscriptEntry[];
+
+    } catch (error) {
+        console.error("Error structuring transcript:", error);
+        // Fallback or mock data for UI development if API key is not set
+        return [
+            { time: "0:00", speaker: "You", dialogue: "Welcome back. How are you arriving today?" },
+            { time: "0:05", speaker: clientName, dialogue: "Drained, honestly. It feels like I never stop moving." },
+            { time: "0:10", speaker: "You", dialogue: "Constant motion. What's that like for you?" },
+            { time: "0:15", speaker: clientName, dialogue: "Exhausting. I wake up tired and go to bed anxious." },
+            { time: "0:20", speaker: "You", dialogue: "This is a mock structured transcript due to an API error." }
+        ];
+    }
+};
+
+
+export const generateIntakeNote = async (transcript: TranscriptEntry[], clientName: string): Promise<GeneratedNote | null> => {
     const formattedTranscript = formatTranscript(transcript);
-    const prompt = `You are a professional therapist's assistant. Based on the following session transcript, generate a structured intake note in JSON format. The client's name is Rhonda Sanchez. The note should include sections for 'Identification Information', 'Family Situation', 'Socio-demographic Information', and 'Reason for seeking therapy'.\n\nTranscript:\n${formattedTranscript}`;
+    const prompt = `You are a professional therapist's assistant. Based on the following session transcript, generate a structured intake note in JSON format. The client's name is ${clientName}. The note should include sections for 'Identification Information', 'Family Situation', 'Socio-demographic Information', and 'Reason for seeking therapy'.\n\nTranscript:\n${formattedTranscript}`;
 
     try {
         const response = await ai.models.generateContent({
@@ -53,7 +117,7 @@ export const generateIntakeNote = async (transcript: TranscriptEntry[]): Promise
         console.error("Error generating intake note:", error);
         // Fallback or mock data for UI development if API key is not set
         return {
-            identificationInformation: "Name: Rhonda Sanchez\nDate of Birth: Unknown (Age: 24 years old)",
+            identificationInformation: `Name: ${clientName}\nDate of Birth: Unknown (Age: 24 years old)`,
             familySituation: "Family Situation: Single mother with two children, has an older sister and a younger sister, mother alive but not in contact, father deceased. Limited contact with grandparents and cousins.",
             socioDemographicInformation: "Socio-demographic Information: 24-year-old warehouse worker, history of substance use and anger issues, strained family relationships, legal issues (DUI), raised Catholic but has concerns about strict rules.",
             reasonForSeekingTherapy: "The client is seeking therapy due to concerns raised by a friend, primarily struggling with anger management, substance abuse (marijuana and Xanax), and maintaining employment and relationships. They also have a history of legal issues and experience occasional suicidal thoughts during difficult times. The client's goals for counseling include managing anger, developing coping skills, improving relationships, and addressing substance use."
