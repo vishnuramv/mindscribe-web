@@ -1,29 +1,77 @@
 
-import React, { useState } from 'react';
+
+import React, { useState, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import Button from '../ui/Button';
 import Icon from '../ui/Icon';
+import Toast from '../ui/Toast';
 import ConfirmationDialog from '../ui/ConfirmationDialog';
 import NewNoteFlowModal from '../sessions/NewNoteFlowModal.tsx';
+import ContextMenu from '../ui/ContextMenu';
+import ComingSoonModal from '../ui/ComingSoonModal';
+import { ICONS } from '../../constants';
 
 const Sidebar: React.FC = () => {
   const { user, logout } = useAuth();
+  const [showToast, setShowToast] = useState(false);
   const [isSignOutConfirmOpen, setIsSignOutConfirmOpen] = useState(false);
   const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false);
+  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const settingsBtnRef = useRef<HTMLButtonElement>(null);
+
+  const [comingSoonModalInfo, setComingSoonModalInfo] = useState<{
+    isOpen: boolean;
+    feature: {
+      title: string;
+      icon: keyof typeof ICONS;
+      message: string;
+      note: string;
+    } | null;
+  }>({ isOpen: false, feature: null });
 
   const navItems = [
-    { to: "/sessions", name: "Sessions", icon: "messageSquare" as const },
+    { to: "/home", name: "Home", icon: "home" as const },
+    { to: "/sessions", name: "Sessions", icon: "fileText" as const },
     { to: "/clients", name: "Clients", icon: "users" as const },
-    { to: "/calendar", name: "Calendar", icon: "calendar" as const },
-    { to: "/templates", name: "Templates", icon: "fileText" as const },
-    { to: "/compliance-checker", name: "Compliance Checker", icon: "checkSquare" as const },
-    { to: "/practice-settings", name: "Practice settings", icon: "settings" as const },
+  ];
+
+  const comingSoonFeatures = [
+    { name: "Calendar", icon: "calendar" as const, message: "Our calendar is on its way—soon you’ll be able to schedule and organize with ease!", note: "We’re building this with care so your workflow gets even smoother. Stay tuned for updates!" },
+    { name: "Templates", icon: "copy" as const, message: "Customizable templates are coming soon to speed up your note-taking process.", note: "Spend less time on documentation and more time with your clients. We're excited to bring this to you!" },
+    { name: "Compliance Checker", icon: "checkSquare" as const, message: "An automated compliance checker is in development to help you stay on top of regulations.", note: "Peace of mind is just around the corner. We're working hard to ensure everything is perfect." },
+    { name: "Practice settings", icon: "settings" as const, message: "Advanced practice settings are being developed to give you more control over your workspace.", note: "We're crafting powerful new ways for you to manage your practice details, billing, and more." },
   ];
 
   const handleLogout = () => {
     setIsSignOutConfirmOpen(false);
     logout();
+  };
+
+  const handleNewNoteClick = () => {
+    setShowToast(true);
+  };
+
+  const handleSettingsMenuToggle = () => {
+      if (!isSettingsMenuOpen && settingsBtnRef.current) {
+          const rect = settingsBtnRef.current.getBoundingClientRect();
+          const menuHeight = 130; // Estimated height of the context menu
+          setMenuPosition({ top: rect.top - menuHeight, left: rect.left });
+      }
+      setIsSettingsMenuOpen(!isSettingsMenuOpen);
+  };
+
+  const handleComingSoonClick = (feature: typeof comingSoonFeatures[0]) => {
+    setComingSoonModalInfo({
+      isOpen: true,
+      feature: {
+        title: feature.name,
+        icon: feature.icon,
+        message: feature.message,
+        note: feature.note,
+      },
+    });
   };
 
   return (
@@ -69,23 +117,68 @@ const Sidebar: React.FC = () => {
                   </NavLink>
                 </li>
               ))}
+              {comingSoonFeatures.map((item) => (
+                <li key={item.name}>
+                  <button
+                    onClick={() => handleComingSoonClick(item)}
+                    className="flex items-center gap-3 px-3 py-2 my-1 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100 w-full text-left"
+                  >
+                    <Icon name={item.icon} className="h-5 w-5" />
+                    {item.name}
+                  </button>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>
         <div className="p-4 border-t border-gray-200">
-          <div className="flex items-center">
+          <button
+              ref={settingsBtnRef}
+              onClick={handleSettingsMenuToggle}
+              className="flex items-center w-full text-left p-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-light"
+              aria-haspopup="true"
+              aria-expanded={isSettingsMenuOpen}
+            >
             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3">
               <span className="font-semibold text-gray-600">VR</span>
             </div>
-            <div>
+            <div className="flex-grow">
               <p className="font-semibold text-sm">{user?.displayName || 'Vishnu Ram'}</p>
-              <button onClick={() => setIsSignOutConfirmOpen(true)} className="text-xs text-gray-500 hover:underline">
-                Sign out
-              </button>
+              <p className="text-xs text-gray-500">Profile & settings</p>
             </div>
-          </div>
+             <Icon name="chevronDown" className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${isSettingsMenuOpen ? 'rotate-180' : ''}`} />
+          </button>
         </div>
       </aside>
+
+      <ContextMenu 
+        isOpen={isSettingsMenuOpen} 
+        onClose={() => setIsSettingsMenuOpen(false)} 
+        position={menuPosition}
+        className="!w-60"
+      >
+        <div className="py-1">
+          <NavLink to="/settings" onClick={() => setIsSettingsMenuOpen(false)} className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
+            <Icon name="settings" className="h-5 w-5 text-gray-500" /> Settings
+          </NavLink>
+        </div>
+        <div className="border-t border-gray-100 my-1"></div>
+        <div className="py-1">
+          <button
+            onClick={() => {
+              setIsSettingsMenuOpen(false);
+              setIsSignOutConfirmOpen(true);
+            }}
+            className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
+          >
+            <Icon name="logOut" className="h-5 w-5" />
+            Sign out
+          </button>
+        </div>
+      </ContextMenu>
+      
+      <Toast message="Will be available soon" show={showToast} onClose={() => setShowToast(false)} />
+      
       <ConfirmationDialog
         isOpen={isSignOutConfirmOpen}
         onClose={() => setIsSignOutConfirmOpen(false)}
@@ -96,6 +189,12 @@ const Sidebar: React.FC = () => {
       <NewNoteFlowModal
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
+      />
+      
+      <ComingSoonModal
+        isOpen={comingSoonModalInfo.isOpen}
+        onClose={() => setComingSoonModalInfo({ isOpen: false, feature: null })}
+        feature={comingSoonModalInfo.feature}
       />
     </>
   );

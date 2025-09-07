@@ -27,6 +27,9 @@ export interface Session {
   date: string;
   type: string;
   time: string;
+  duration?: number; // duration in minutes
+  title: string;
+  description: string;
   transcript: TranscriptEntry[];
   privateNote?: string;
 }
