@@ -51,7 +51,7 @@ const SettingsPage: React.FC = () => {
             displayName: 'Vishnu R.',
             title: 'Therapist',
             specializations: ['MI: Motivational Interviewing', 'Play Therapy'],
-            contactEmail: 'demo@upheal.io',
+            contactEmail: 'demo@mindscribe.io',
             contactPhone: '(555) 123-4567',
             address: '123 Wellness Ave, Suite 100, Mindful City, ST 12345'
         },

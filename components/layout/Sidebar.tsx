@@ -80,7 +80,7 @@ const Sidebar: React.FC = () => {
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-purple-200 rounded-lg"></div>
-              <span className="text-xl font-bold text-gray-800 tracking-tighter">Upheal</span>
+              <span className="text-xl font-bold text-gray-800 tracking-tighter">MindScribe</span>
           </div>
         </div>
         <div className="p-4 flex-grow">
