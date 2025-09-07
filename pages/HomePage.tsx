@@ -103,7 +103,7 @@ const FinancialPerformanceWidget = () => (
 const TherapistWellnessWidget = () => (
     <DashboardWidget title="Therapist Wellness Meter">
        <div className="space-y-4">
-            <StatCard icon="user" label="My Wellbeing Score" value="3.8/5" change="-0.2" iconBgColor="bg-purple-100" iconColor="text-purple-600" />
+            <StatCard icon="user" label="My Wellbeing Score" value="3.8/5" change="-0.2" iconBgColor="bg-blue-100" iconColor="text-blue-600" />
             <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
                 <p className="text-sm font-semibold text-green-800">Burnout Risk: Low</p>
                 <p className="text-xs text-green-600">Caseload and duration are balanced.</p>

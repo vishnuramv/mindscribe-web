@@ -79,7 +79,7 @@ const Sidebar: React.FC = () => {
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-purple-200 rounded-lg"></div>
+              <div className="w-8 h-8 bg-blue-200 rounded-lg"></div>
               <span className="text-xl font-bold text-gray-800 tracking-tighter">MindScribe</span>
           </div>
         </div>

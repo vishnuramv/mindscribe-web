@@ -28,7 +28,7 @@ const LoginPage: React.FC = () => {
       <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
         <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2">
-                <div className="w-8 h-8 bg-purple-200 rounded-lg"></div>
+                <div className="w-8 h-8 bg-blue-200 rounded-lg"></div>
                 <h1 className="text-3xl font-bold text-gray-800 tracking-tighter">MindScribe</h1>
             </div>
             <p className="text-gray-500 mt-2">Welcome back, please sign in.</p>

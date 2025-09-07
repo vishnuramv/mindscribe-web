@@ -167,7 +167,7 @@ const ClientDetailPage: React.FC = () => {
             <aside className="w-[380px] bg-light-gray border-l border-gray-200 p-6 flex flex-col gap-6 overflow-y-auto">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-purple-200 text-purple-700 rounded-full flex items-center justify-center font-bold text-lg">{initials}</div>
+                        <div className="w-10 h-10 bg-blue-200 text-blue-700 rounded-full flex items-center justify-center font-bold text-lg">{initials}</div>
                         <h1 className="text-xl font-bold text-gray-800">{client.firstName} {client.lastName}</h1>
                     </div>
                     <button ref={optionsBtnRef} onClick={() => handleMenuOpen(optionsBtnRef, setIsOptionsMenuOpen, 'right')} className="p-2 text-gray-500 hover:bg-gray-200 rounded-md"><Icon name="moreVertical" className="h-5 w-5"/></button>

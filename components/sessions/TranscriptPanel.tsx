@@ -18,7 +18,7 @@ const TranscriptPanel: React.FC<TranscriptPanelProps> = ({ transcript, title }) 
           <div key={index} className="flex gap-4">
             <div className="text-sm text-gray-500 w-16 text-right">{entry.time}</div>
             <div className="flex-1">
-              <p className={`font-semibold ${entry.speaker === 'You' ? 'text-purple-600' : 'text-pink-600'}`}>
+              <p className={`font-semibold ${entry.speaker === 'You' ? 'text-blue-600' : 'text-pink-600'}`}>
                 {entry.speaker}
               </p>
               <p className="text-gray-700">{entry.dialogue}</p>
