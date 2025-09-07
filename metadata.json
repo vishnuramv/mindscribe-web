@@ -1,0 +1,5 @@
+{
+  "name": "MindScribe - Therapist Dashboard",
+  "description": "A comprehensive dashboard for therapists to manage clients, transcribe sessions, and generate AI-powered notes and summaries. Includes client management, session transcription viewing, and intelligent note generation features.",
+  "requestFramePermissions": []
+}

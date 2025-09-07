@@ -1,0 +1,13 @@
+.transcript-container {
+    background-color: blue;
+}
+
+.transcript-header {
+    background-color: red;
+}
+
+.transcript-content-container {
+    background-color: green;
+    /* max-height: 82vh;
+    overflow-y: scroll; */
+}
